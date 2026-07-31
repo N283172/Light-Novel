@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LightNovel Hub - Đọc Truyện Online</title>
+    <style>
+        /* ==================== GLOBAL STYLES & VARIABLES ==================== */
+        :root {
+            --bg-color: #121212;
+            --surface-color: #1e1e1e;
+            --text-color: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --accent-color: #00adb5;
+            --accent-hover: #008c93;
+            --border-color: #333333;
+            --reader-bg: #181818;
+            --reader-text: #d1d1d1;
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --max-width: 1100px;
+        }
+
+        [data-theme="sepia"] {
+            --bg-color: #f4ecd8;
+            --surface-color: #e8dfc8;
+            --text-color: #5b4636;
+            --text-secondary: #7c6858;
+            --accent-color: #8c6d46;
+            --border-color: #d3c4a9;
+            --reader-bg: #f4ecd8;
+            --reader-text: #2c221e;
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f8f9fa;
+            --surface-color: #ffffff;
+            --text-color: #212529;
+            --text-secondary: #6c757d;
+            --accent-color: #0d6efd;
+            --border-color: #dee2e6;
+            --reader-bg: #ffffff;
+            --reader-text: #111111;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        a { color: inherit; text-decoration: none; }
+        button { cursor: pointer; border: none; background: none; font-family: inherit; color: inherit; }
+
+        /* ==================== NAVBAR ==================== */
+        .navbar {
+            background-color: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .nav-container {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            padding: 0.8rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo { font-size: 1.4rem; font-weight: bold; color: var(--accent-color); }
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 0.3rem 0.8rem;
+        }
+        .search-box input {
+            border: none;
+            background: transparent;
+            color: var(--text-color);
+            padding: 0.2rem;
+            outline: none;
+        }
+
+        /* ==================== MAIN CONTAINER ==================== */
+        .container {
+            max-width: var(--max-width);
+            margin: 1.5rem auto;
+            padding: 0 1rem;
+            min-height: 80vh;
+        }
+
+        .view { display: none; }
+        .view.active { display: block; }
+
+        /* ==================== NOVEL GRID (HOME) ==================== */
+        .section-title {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--accent-color);
+            padding-left: 0.5rem;
+        }
+        .novel-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1.2rem;
+        }
+        .novel-card {
+            background: var(--surface-color);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        .novel-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .novel-cover { width: 100%; height: 240px; object-fit: cover; }
+        .novel-info { padding: 0.8rem; }
+        .novel-title { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.3rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .novel-meta { font-size: 0.8rem; color: var(--text-secondary); }
+
+        /* ==================== NOVEL DETAIL VIEW ==================== */
+        .detail-header {
+            display: flex;
+            gap: 1.5rem;
+            background: var(--surface-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+        .detail-cover { width: 200px; height: 280px; object-fit: cover; border-radius: 6px; }
+        .detail-info { flex: 1; }
+        .detail-title { font-size: 1.8rem; margin-bottom: 0.5rem; }
+        .detail-author { color: var(--text-secondary); margin-bottom: 0.8rem; }
+        .genres { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .tag { background: var(--bg-color); padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.8rem; border: 1px solid var(--border-color); }
+        .description { font-size: 0.95rem; margin-bottom: 1rem; line-height: 1.5; }
+        .chapter-list {
+            background: var(--surface-color);
+            border-radius: 8px;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+        }
+        .chapter-item {
+            padding: 0.7rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+        .chapter-item:hover { background: var(--bg-color); color: var(--accent-color); }
+
+        /* ==================== READER VIEW ==================== */
+        .reader-controls {
+            position: sticky;
+            top: 60px;
+            background: var(--surface-color);
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .btn-group { display: flex; gap: 0.5rem; align-items: center; }
+        .btn {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            padding: 0.3rem 0.7rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        .btn:hover { border-color: var(--accent-color); }
+        .reader-content {
+            background: var(--reader-bg);
+            color: var(--reader-text);
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            max-width: 800px;
+            margin: 0 auto;
+            font-size: 18px;
+            line-height: 1.8;
+        }
+        .reader-content p { margin-bottom: 1.2rem; }
+        .reader-nav {
+            display: flex;
+            justify-content: space-between;
+            max-width: 800px;
+            margin: 1.5rem auto;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 600px) {
+            .detail-header { flex-direction: column; align-items: center; text-align: center; }
+            .detail-cover { width: 150px; height: 210px; }
+            .reader-content { padding: 1rem; font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo" onclick="showHome()">LN-Hub</a>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Tìm kiếm truyện..." oninput="handleSearch()">
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <div class="container">
+
+        <!-- VIEW 1: HOME PAGE -->
+        <div id="homeView" class="view active">
+            <h2 class="section-title">Truyện Mới Cập Nhật</h2>
+            <div class="novel-grid" id="novelGrid"></div>
+        </div>
+
+        <!-- VIEW 2: NOVEL DETAIL -->
+        <div id="detailView" class="view">
+            <button class="btn" onclick="showHome()" style="margin-bottom: 1rem;">← Quay lại</button>
+            <div class="detail-header">
+                <img id="detailCover" class="detail-cover" src="" alt="Cover">
+                <div class="detail-info">
+                    <h1 id="detailTitle" class="detail-title"></h1>
+                    <div id="detailAuthor" class="detail-author"></div>
+                    <div id="detailGenres" class="genres"></div>
+                    <p id="detailDesc" class="description"></p>
+                    <button class="btn" style="background: var(--accent-color); color: #fff; padding: 0.5rem 1rem;" onclick="readFirstChapter()">Đọc Từ Đầu</button>
+                </div>
+            </div>
+            <h3 class="section-title">Danh Sách Chương</h3>
+            <div class="chapter-list" id="chapterList"></div>
+        </div>
+
+        <!-- VIEW 3: READER PAGE -->
+        <div id="readerView" class="view">
+            <div class="reader-controls">
+                <button class="btn" onclick="showDetail(currentNovel.id)">← MỤC LỤC</button>
+                <div class="btn-group">
+                    <button class="btn" onclick="adjustFontSize(-2)">A-</button>
+                    <span id="fontSizeLabel">18px</span>
+                    <button class="btn" onclick="adjustFontSize(2)">A+</button>
+                </div>
+                <div class="btn-group">
+                    <button class="btn" onclick="setTheme('dark')">Dark</button>
+                    <button class="btn" onclick="setTheme('sepia')">Sepia</button>
+                    <button class="btn" onclick="setTheme('light')">Light</button>
+                </div>
+            </div>
+
+            <div class="reader-content" id="readerContent">
+                <h2 id="readerChapterTitle" style="margin-bottom: 1.5rem; text-align: center;"></h2>
+                <div id="chapterBody"></div>
+            </div>
+
+            <div class="reader-nav">
+                <button class="btn" id="prevBtn" onclick="navigateChapter(-1)">Chương Trước</button>
+                <button class="btn" id="nextBtn" onclick="navigateChapter(1)">Chương Sau</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        /* ==================== DỮ LIỆU MẪU (MOCK DATA) ==================== */
+        const novelsData = [
+            {
+                id: 1,
+                title: "Toàn Trí Độc Giả (Omniscient Reader's Viewpoint)",
+                author: "Sing Shong",
+                cover: "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?w=400",
+                genres: ["Hành Động", "Kỳ Ảo", "Hệ Thống"],
+                description: "Kim Dokja là một nhân viên văn phòng bình thường. Sở thích duy nhất của anh là đọc tiểu thuyết mạng '3 Cách Để Sống Sót Trong Thế Giới Tận Thế'. Khi chương cuối cùng được xuất bản, thế giới thực tại đột ngột biến thành thế giới trong cuốn tiểu thuyết...",
+                chapters: [
+                    { id: 1, title: "Chương 1: Bắt đầu dịch dịch vụ miễn phí", content: "<p>Lúc đó, tôi đang ngồi trên chuyến xe điện ngầm chạy qua sông Hán.</p><p>'Tôi là độc giả duy nhất đã đọc hết bộ truyện này đến chương cuối cùng...'</p><p>Đột nhiên, toàn bộ toa xe chìm vào bóng tối. Một sinh vật bí ẩn có đôi cánh nhỏ hiện ra giữa không trung.</p>" },
+                    { id: 2, title: "Chương 2: Kịch bản đầu tiên", content: "<p>Sinh vật đó tự xưng là Dokkaebi. Nó mỉm cười độc ác trước toàn bộ hành khách.</p><p>[Kịch bản chính #1 - Cung cấp bằng chứng về sự sống đã bắt đầu.]</p><p>Yêu cầu: Hãy giết ít nhất một sinh vật sống trong vòng 30 phút.</p>" }
+                ]
+            },
+            {
+                id: 2,
+                title: "Chuyện Tình Hài Hước Trong Trường Học",
+                author: "Wataru Watari",
+                cover: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400",
+                genres: ["Học Đường", "Lãng Mạn", "Hài Hước"],
+                description: "Câu chuyện xoay quanh Hikigaya Hachiman, một nam sinh có cái nhìn lệch lạc và u tối về cuộc sống. Sau khi nộp một bài văn đầy định kiến, anh bị cô giáo phạt phải tham gia CLB Tình Nguyện...",
+                chapters: [
+                    { id: 1, title: "Chương 1: Cụm từ thanh xuân luôn là một lời dối trá", content: "<p>Thanh xuân là một trò đùa. Những kẻ luôn miệng ca ngợi thanh xuân chỉ đang tự lừa dối chính mình và những người xung quanh.</p><p>Đó là góc nhìn của tôi, Hikigaya Hachiman.</p>" }
+                ]
+            }
+        ];
+
+        /* ==================== STATE MANAGEMENT ==================== */
+        let currentNovel = null;
+        let currentChapterIndex = 0;
+        let fontSize = parseInt(localStorage.getItem('ln_font_size')) || 18;
+        let currentTheme = localStorage.getItem('ln_theme') || 'dark';
+
+        // Khởi tạo ứng dụng
+        document.addEventListener("DOMContentLoaded", () => {
+            applyTheme(currentTheme);
+            applyFontSize(fontSize);
+            renderNovelGrid(novelsData);
+        });
+
+        /* ==================== NAVIGATION / ROUTING ==================== */
+        function showView(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        function showHome() {
+            showView('homeView');
+        }
+
+        function showDetail(novelId) {
+            currentNovel = novelsData.find(n => n.id === novelId);
+            if (!currentNovel) return;
+
+            document.getElementById('detailCover').src = currentNovel.cover;
+            document.getElementById('detailTitle').textContent = currentNovel.title;
+            document.getElementById('detailAuthor').textContent = `Tác giả: ${currentNovel.author}`;
+            document.getElementById('detailDesc').textContent = currentNovel.description;
+
+            // Genres
+            const genresEl = document.getElementById('detailGenres');
+            genresEl.innerHTML = currentNovel.genres.map(g => `<span class="tag">${g}</span>`).join('');
+
+            // Chapter list
+            const listEl = document.getElementById('chapterList');
+            listEl.innerHTML = currentNovel.chapters.map((chap, index) => `
+                <div class="chapter-item" onclick="openChapter(${index})">
+                    <span>${chap.title}</span>
+                </div>
+            `).join('');
+
+            showView('detailView');
+        }
+
+        function openChapter(index) {
+            if (!currentNovel || !currentNovel.chapters[index]) return;
+            currentChapterIndex = index;
+            const chapter = currentNovel.chapters[index];
+
+            document.getElementById('readerChapterTitle').textContent = chapter.title;
+            document.getElementById('chapterBody').innerHTML = chapter.content;
+
+            // Update UI buttons
+            document.getElementById('prevBtn').disabled = index === 0;
+            document.getElementById('nextBtn').disabled = index === currentNovel.chapters.length - 1;
+
+            showView('readerView');
+        }
+
+        function readFirstChapter() {
+            if (currentNovel && currentNovel.chapters.length > 0) {
+                openChapter(0);
+            }
+        }
+
+        function navigateChapter(direction) {
+            const newIndex = currentChapterIndex + direction;
+            if (newIndex >= 0 && newIndex < currentNovel.chapters.length) {
+                openChapter(newIndex);
+            }
+        }
+
+        /* ==================== UI / SETTINGS FUNCTIONS ==================== */
+        function renderNovelGrid(data) {
+            const grid = document.getElementById('novelGrid');
+            grid.innerHTML = data.map(novel => `
+                <div class="novel-card" onclick="showDetail(${novel.id})">
+                    <img class="novel-cover" src="${novel.cover}" alt="${novel.title}">
+                    <div class="novel-info">
+                        <div class="novel-title">${novel.title}</div>
+                        <div class="novel-meta">${novel.chapters.length} Chương</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function handleSearch() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = novelsData.filter(n => 
+                n.title.toLowerCase().includes(query) || 
+                n.author.toLowerCase().includes(query) ||
+                n.genres.some(g => g.toLowerCase().includes(query))
+            );
+            renderNovelGrid(filtered);
+            showHome();
+        }
+
+        function adjustFontSize(delta) {
+            fontSize = Math.min(Math.max(fontSize + delta, 14), 28);
+            applyFontSize(fontSize);
+            localStorage.setItem('ln_font_size', fontSize);
+        }
+
+        function applyFontSize(size) {
+            document.getElementById('readerContent').style.fontSize = size + 'px';
+            document.getElementById('fontSizeLabel').textContent = size + 'px';
+        }
+
+        function setTheme(theme) {
+            currentTheme = theme;
+            applyTheme(theme);
+            localStorage.setItem('ln_theme', theme);
+        }
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+        }
+    </script>
+</body>
+  </html>
+
